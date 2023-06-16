@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Websocket</title>
+  </head>
+  <body>
+    <h1>Websocket</h1>
+    <div>
+      <ul id="list"></ul>
+      <input type="text" id="input" />
+      <button id="btn">发送</button>
+      <button id="stop">断开</button>
+    </div>
+    <script>
+      // 创建websocket对象
+      const ws = new WebSocket("ws://localhost:8080")
+      // open 连接成功
+      ws.addEventListener("open", () => {
+        console.log("nodejs服务器连接成功")
+        // 发送消息
+        // ws.send("hello")
+      })
+
+      let btn = document.getElementById("btn")
+      let input = document.getElementById("input")
+      let list = document.getElementById("list")
+      let stop = document.getElementById("stop")
+      btn.addEventListener("click", () => {
+        if (input.value === "") return
+        ws.send(input.value)
+        input.value = ""
+      })
+      // message 接收服务端消息
+      ws.addEventListener("message", (msg) => {
+        console.log("接收到服务端消息", msg.data)
+        let data = JSON.parse(msg.data.toString())
+        if (data.state === 1) {
+          let li = document.createElement("li")
+          li.innerText = data.message
+          list.appendChild(li)
+          return
+        }
+      })
+
+      // close 关闭连接
+      stop.addEventListener("click", () => {
+        ws.close()
+      })
+    </script>
+  </body>
+</html>
